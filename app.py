@@ -18,7 +18,7 @@ from screens.about import show_about
 # ----------------------------
 st.set_page_config(
     page_title="Stunting Guard - Deteksi Dini Stunting",
-    page_icon="👶",
+    page_icon="🛡️",
     layout="wide"
 )
 
@@ -36,28 +36,38 @@ add_custom_css()
 # 4. SIDEBAR & NAVIGASI
 # ----------------------------
 with st.sidebar:
-    # --- LOGO & JUDUL ---
-    # Jika kamu punya logo.png di folder images, uncomment baris bawah:
-    # st.image("images/logo.png", width=200) 
-    
+    # --- LOGO & JUDUL - PREMIUM STYLING ---
     st.markdown("""
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #4CAF50; margin:0;">👶 Stunting Guard</h1>
-            <p style="font-size: 12px; color: #666;">Sistem Deteksi Dini Stunting</p>
+        <div class="sidebar-brand">
+            <h1 style="
+                font-size: 1.75rem !important;
+                font-weight: 800;
+                background: linear-gradient(135deg, #059669 0%, #10B981 50%, #34D399 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin: 0;
+                letter-spacing: -0.02em;
+            ">Stunting Guard</h1>
+            <p style="
+                font-size: 0.85rem;
+                color: #6B7280;
+                margin: 8px 0 0 0;
+                font-weight: 500;
+            ">Sistem Deteksi Dini Stunting</p>
         </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    st.markdown("""<hr style="margin: 10px 0 20px 0; opacity: 0.3;">""", unsafe_allow_html=True)
 
     # --- MENU PILIHAN ---
-    # Kita pakai radio button yang disamarkan jadi menu navigasi
     menu_options = [
         "Home",
         "Upload Dataset",
         "Preprocessing Data",
         "Data Analysis",
         "Visualisasi Data",
-        "Prediksi & Mitigasi",  # Halaman Utama (Decision Tree)
+        "Prediksi & Mitigasi",
         "Tentang Kami"
     ]
 
@@ -65,7 +75,6 @@ with st.sidebar:
     current_page = st.session_state.get("page", "Home")
 
     # Logika agar radio button mengikuti posisi halaman yang sedang aktif
-    # (Misal: kalau diklik "Next" di Home, sidebar otomatis pindah ke Upload)
     if current_page in menu_options:
         index_menu = menu_options.index(current_page)
     else:
@@ -75,24 +84,31 @@ with st.sidebar:
         "Menu Navigasi",
         menu_options,
         index=index_menu,
-        label_visibility="collapsed" # Sembunyikan label "Menu Navigasi" biar rapi
+        label_visibility="collapsed"
     )
 
     # --- UPDATE HALAMAN JIKA KLIK MENU ---
     if selected_menu != current_page:
         st.session_state["page"] = selected_menu
-        st.rerun() # Refresh halaman segera
+        st.rerun()
 
     # --- INFO TAMBAHAN DI BAWAH ---
-    st.markdown("---")
-    st.caption("© 2025 Tugas Besar Akuisisi Data")
-    st.caption("Kelompok Stunting Guard")
+    st.markdown("""<hr style="margin: 20px 0; opacity: 0.3;">""", unsafe_allow_html=True)
+    
+    st.markdown("""
+        <div style="text-align: center; padding: 10px 0;">
+            <p style="font-size: 0.75rem; color: #9CA3AF; margin: 0;">
+                © 2025 Tugas Besar Akuisisi Data
+            </p>
+            <p style="font-size: 0.75rem; color: #9CA3AF; margin: 4px 0 0 0; font-weight: 500;">
+                Kelompok Stunting Guard
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
 # ----------------------------
 # 5. PAGE ROUTER (Pengarah Halaman)
 # ----------------------------
-# Kode ini yang menentukan fungsi mana yang dipanggil berdasarkan menu
-
 page = st.session_state["page"]
 
 if page == "Home":

@@ -1,17 +1,21 @@
 import streamlit as st
 
 def show_about():
-    # Judul Halaman
-    st.markdown("<h1 style='text-align: center; color: #2E7D32;'>👥 Tim Pengembang</h1>", unsafe_allow_html=True)
+    # Header
+    st.markdown("""
+        <div class="hero-section">
+            <h1>Tim Pengembang</h1>
+        </div>
+    """, unsafe_allow_html=True)
 
     # Deskripsi Proyek
     st.markdown("""
     <div class='info-box' style='text-align: center;'>
-        <p>
+        <p style="margin: 0 0 8px 0;">
             Aplikasi <b>Stunting Guard</b> ini dipersembahkan sebagai Luaran 
             <b>Tugas Besar Mata Kuliah Akuisisi Data</b>.
         </p>
-        <p>
+        <p style="margin: 0;">
             Kami berkomitmen untuk menghadirkan solusi teknologi tepat guna 
             dalam membantu pencegahan stunting di Indonesia.
         </p>
@@ -20,67 +24,100 @@ def show_about():
 
     st.markdown("---")
 
-    # Data Anggota Kelompok (Sesuai Request)
+    # Data Anggota Kelompok
     team_members = [
         {
             "name": "Aldi",
             "nim": "2311521012",
             "role": "Hacker (Programmer)",
-            "img_url": "https://ui-avatars.com/api/?name=Aldi&background=4CAF50&color=fff&size=256"
+            "img_url": "https://ui-avatars.com/api/?name=Aldi&background=059669&color=fff&size=256&bold=true&font-size=0.4"
         },
         {
             "name": "Amanda Fitri Abdillah",
             "nim": "2311522034",
             "role": "Hacker (Programmer)",
-            "img_url": "https://ui-avatars.com/api/?name=Amanda+Fitri&background=E91E63&color=fff&size=256"
+            "img_url": "https://ui-avatars.com/api/?name=Amanda+Fitri&background=DB2777&color=fff&size=256&bold=true&font-size=0.4"
         },
         {
             "name": "Hasbi Ash Shiddiqi",
             "nim": "2311523014",
             "role": "Hacker (Programmer)",
-            "img_url": "https://ui-avatars.com/api/?name=Hasbi+Ash&background=2196F3&color=fff&size=256"
+            "img_url": "https://ui-avatars.com/api/?name=Hasbi+Ash&background=2563EB&color=fff&size=256&bold=true&font-size=0.4"
         }
     ]
 
-    # Tampilkan Kartu Anggota (3 Kolom Sejajar)
+    # Tampilkan Kartu Anggota
     col1, col2, col3 = st.columns(3)
-
-    # Loop untuk menampilkan setiap anggota di kolom masing-masing
     columns = [col1, col2, col3]
+    
+    colors = ["#059669", "#DB2777", "#2563EB"]
     
     for i, col in enumerate(columns):
         member = team_members[i]
+        color = colors[i]
         with col:
-            # Tampilan Kartu dengan CSS Custom
             st.markdown(f"""
             <div style="
-                background-color: white; 
-                border-radius: 15px; 
-                padding: 20px; 
+                background: white;
+                border-radius: 20px;
+                padding: 32px 24px;
                 text-align: center;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                border-top: 5px solid #2E7D32;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                border-top: 5px solid {color};
                 margin-bottom: 20px;
             ">
-                <img src="{member['img_url']}" style="border-radius: 50%; width: 100px; height: 100px; margin-bottom: 15px;">
-                <h3 style="color: #333; font-size: 18px; margin: 0;">{member['name']}</h3>
-                <p style="color: #666; font-size: 14px; margin: 5px 0;"><b>NIM: {member['nim']}</b></p>
+                <img src="{member['img_url']}" style="
+                    border-radius: 50%; 
+                    width: 100px; 
+                    height: 100px; 
+                    margin-bottom: 20px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                    border: 4px solid white;
+                ">
+                <h3 style="
+                    font-family: 'Inter', sans-serif;
+                    color: #1F2937; 
+                    font-size: 1.1rem; 
+                    font-weight: 700;
+                    margin: 0 0 8px 0;
+                ">{member['name']}</h3>
+                <p style="
+                    color: #6B7280; 
+                    font-size: 0.9rem; 
+                    margin: 0 0 16px 0;
+                ">NIM: {member['nim']}</p>
                 <span style="
-                    background-color: #E8F5E9; 
-                    color: #2E7D32; 
-                    padding: 5px 10px; 
-                    border-radius: 20px; 
-                    font-size: 12px;
-                    font-weight: bold;
+                    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+                    color: #047857; 
+                    padding: 8px 20px; 
+                    border-radius: 25px; 
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    display: inline-block;
                 ">{member['role']}</span>
             </div>
             """, unsafe_allow_html=True)
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Footer Quote
     st.markdown("""
-    <div style="text-align: center; color: #888; font-style: italic;">
-        "Mencegah stunting adalah investasi terbaik untuk masa depan bangsa."
+    <div style="
+        text-align: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+        border-radius: 20px;
+        margin-top: 20px;
+    ">
+        <p style="
+            font-size: 1.25rem;
+            font-style: italic;
+            color: #065F46;
+            margin: 0;
+            line-height: 1.6;
+        ">
+            "Mencegah stunting adalah investasi terbaik untuk masa depan bangsa."
+        </p>
     </div>
     """, unsafe_allow_html=True)

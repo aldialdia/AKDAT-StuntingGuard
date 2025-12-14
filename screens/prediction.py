@@ -3,7 +3,12 @@ import pandas as pd
 import numpy as np
 
 def show_prediction():
-    st.markdown("<h1 style='text-align: center; color: #2E7D32;'>🔍 Prediksi & Mitigasi Stunting</h1>", unsafe_allow_html=True)
+    # Header
+    st.markdown("""
+        <div class="hero-section">
+            <h1>Prediksi & Mitigasi Stunting</h1>
+        </div>
+    """, unsafe_allow_html=True)
 
     # 1. CEK MODEL SUDAH ADA BELUM
     model = st.session_state.get("model")
@@ -15,17 +20,22 @@ def show_prediction():
             st.rerun()
         return
 
-    # Keterangan
+    # Info Box
     st.markdown("""
     <div class='info-box'>
-        Masukkan data balita di bawah ini. Sistem akan memprediksi status gizi dan 
-        memberikan <b>Rekomendasi Mitigasi</b> jika terdeteksi risiko.
+        <p style="margin: 0;">
+            Masukkan data balita di bawah ini. Sistem akan memprediksi status gizi dan 
+            memberikan <b>Rekomendasi Mitigasi</b> jika terdeteksi risiko.
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
-    # 2. FORM INPUT DATA (User Friendly)
+    # 2. FORM INPUT DATA
+    st.markdown("""
+        <h3 style="margin: 24px 0 16px 0;">Data Balita</h3>
+    """, unsafe_allow_html=True)
+    
     with st.form("prediksi_form"):
-        st.subheader("Data Balita")
         col1, col2 = st.columns(2)
         
         with col1:
@@ -35,97 +45,156 @@ def show_prediction():
         with col2:
             tb = st.number_input("Tinggi Badan (cm)", min_value=30.0, max_value=120.0, value=75.0, step=0.1)
 
-        # Tombol Submit Besar
-        submitted = st.form_submit_button("🔍 Cek Status Gizi Sekarang", type="primary", use_container_width=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        submitted = st.form_submit_button("Cek Status Gizi Sekarang", type="primary", use_container_width=True)
 
-    # 3. LOGIKA PREDIKSI (Hanya jalan kalau tombol ditekan)
+    # 3. LOGIKA PREDIKSI
     if submitted:
-        # a. Persiapkan Data Input agar sesuai format Training
-        # Ingat! Di helpers.py: Laki-laki=0, Perempuan=1
         jk_encoded = 0 if jk_input == "Laki-laki" else 1
         
-        # Buat DataFrame Input (Nama kolom HARUS SAMA PERSIS dengan dataset asli)
         input_data = pd.DataFrame([[umur, jk_encoded, tb]], 
                                 columns=["Umur (bulan)", "Jenis Kelamin", "Tinggi Badan (cm)"])
         
-        # b. Lakukan Prediksi
         try:
-            # Prediksi Kelas (0, 1, 2, dst)
             pred_index = model.predict(input_data)[0]
-            
-            # Prediksi Probabilitas (Seberapa yakin modelnya?)
             pred_proba = model.predict_proba(input_data)
-            confidence = np.max(pred_proba) * 100  # Ambil skor tertinggi
+            confidence = np.max(pred_proba) * 100
             
-            # c. Terjemahkan Kode Angka kembali ke Teks (Normal/Stunted)
-            # Ambil mapping dari session state
             mapping = st.session_state.get("preprocess_info", {}).get("target_mapping", {})
-            
-            # Hasil Teks Akhir
             hasil_status = mapping.get(pred_index, "Tidak Diketahui").lower()
             
             st.markdown("---")
-            st.subheader("📋 Hasil Analisis AI")
+            st.markdown("""
+                <h3 style="margin-bottom: 16px;">Hasil Analisis AI</h3>
+            """, unsafe_allow_html=True)
             
-            # --- TAMBAHAN KALIMAT RANGKUMAN (SESUAI REQUEST) ---
-            st.info(f"ℹ️ Hasil Analisis AI menunjukkan, bayi berkelamin **{jk_input}** dengan usia **{umur}** bulan dan tinggi badan **{tb}** cm masuk dalam kategori:")
+            # --- RANGKUMAN ---
+            st.markdown(f"""
+                <div style="
+                    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+                    padding: 20px 24px;
+                    border-radius: 12px;
+                    border-left: 4px solid #3B82F6;
+                    margin-bottom: 24px;
+                ">
+                    <p style="margin: 0; color: #1E40AF;">
+                        Hasil Analisis AI menunjukkan, bayi berkelamin <b>{jk_input}</b> dengan usia <b>{umur} bulan</b> 
+                        dan tinggi badan <b>{tb} cm</b> masuk dalam kategori:
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
 
-            # 4. TAMPILAN HASIL (Dynamic UI)
+            # 4. TAMPILAN HASIL
             
-            # KONDISI 1: AMAN (Normal / Tinggi)
+            # KONDISI 1: AMAN
             if "normal" in hasil_status or "tinggi" in hasil_status:
-                st.success(f"✅ **Status Gizi: {hasil_status.upper()}**")
-                st.write(f"Model yakin **{confidence:.1f}%** dengan keputusan ini.")
+                st.markdown(f"""
+                    <div class="result-success">
+                        <h2 style="margin: 0 0 12px 0; color: #065F46 !important;">
+                            ✓ Status Gizi: {hasil_status.upper()}
+                        </h2>
+                        <p style="margin: 0; color: #047857;">
+                            Model yakin <b>{confidence:.1f}%</b> dengan keputusan ini.
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
                 
                 st.markdown("""
-                <div style="background-color: #d4edda; padding: 15px; border-radius: 10px; border-left: 5px solid #28a745; color: #155724;">
-                    <b>Kabar Baik!</b> Pertumbuhan anak sesuai dengan usianya.
-                    <ul>
-                        <li>Tetap pertahankan pemberian gizi seimbang.</li>
-                        <li>Pantau terus setiap bulan di Posyandu.</li>
-                    </ul>
-                </div>
+                    <div style="
+                        background: white;
+                        padding: 24px;
+                        border-radius: 16px;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                        border: 1px solid rgba(16, 185, 129, 0.2);
+                        margin-top: 20px;
+                    ">
+                        <h4 style="color: #047857; margin: 0 0 12px 0;">Kabar Baik!</h4>
+                        <p style="color: #374151; margin: 0 0 12px 0;">Pertumbuhan anak sesuai dengan usianya.</p>
+                        <ul style="color: #4B5563; margin: 0; padding-left: 20px;">
+                            <li>Tetap pertahankan pemberian gizi seimbang.</li>
+                            <li>Pantau terus setiap bulan di Posyandu.</li>
+                        </ul>
+                    </div>
                 """, unsafe_allow_html=True)
 
-            # KONDISI 2: BAHAYA (Stunted / Severely Stunted)
-            elif "stunted" in hasil_status: # Menangkap 'stunted' dan 'severely stunted'
-                st.error(f"⚠️ **Status Gizi: {hasil_status.upper()}**")
-                st.write(f"Model memprediksi risiko ini dengan tingkat keyakinan **{confidence:.1f}%**.")
+            # KONDISI 2: BAHAYA
+            elif "stunted" in hasil_status:
+                st.markdown(f"""
+                    <div class="result-danger">
+                        <h2 style="margin: 0 0 12px 0; color: #7F1D1D !important;">
+                            ⚠ Status Gizi: {hasil_status.upper()}
+                        </h2>
+                        <p style="margin: 0; color: #991B1B;">
+                            Model memprediksi risiko ini dengan tingkat keyakinan <b>{confidence:.1f}%</b>.
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
                 
-                # --- FITUR MITIGASI (Saran Tindakan) ---
-                st.markdown("### 🛡️ Rencana Mitigasi (Saran Tindakan)")
+                # FITUR MITIGASI
+                st.markdown("""
+                    <h3 style="margin: 32px 0 16px 0; color: #047857;">Rencana Mitigasi (Saran Tindakan)</h3>
+                """, unsafe_allow_html=True)
                 
                 mitigasi_text = ""
                 
-                # Logika Mitigasi Berdasarkan Umur (Personalized Advice)
                 if umur < 6:
                     mitigasi_text = """
-                    1. **Fokus ASI Eksklusif:** Jangan berikan makanan tambahan apapun.
-                    2. **Cek Perlekatan:** Konsultasikan ke konselor laktasi jika bayi sulit menyusu.
-                    3. **Ibu Menyusui:** Ibu wajib makan protein tinggi (telur, ikan, daging).
+                    <ul style="color: #374151; line-height: 1.8;">
+                        <li><b>Fokus ASI Eksklusif:</b> Jangan berikan makanan tambahan apapun.</li>
+                        <li><b>Cek Perlekatan:</b> Konsultasikan ke konselor laktasi jika bayi sulit menyusu.</li>
+                        <li><b>Ibu Menyusui:</b> Ibu wajib makan protein tinggi (telur, ikan, daging).</li>
+                    </ul>
                     """
                 elif 6 <= umur <= 23:
                     mitigasi_text = """
-                    1. **Protein Hewani Wajib:** Setiap kali makan harus ada telur/ikan/ayam.
-                    2. **Cek Porsi:** Pastikan porsi MPASI ditingkatkan sesuai umur.
-                    3. **Lemak Tambahan:** Tambahkan minyak kelapa/santan/margarin pada MPASI.
+                    <ul style="color: #374151; line-height: 1.8;">
+                        <li><b>Protein Hewani Wajib:</b> Setiap kali makan harus ada telur/ikan/ayam.</li>
+                        <li><b>Cek Porsi:</b> Pastikan porsi MPASI ditingkatkan sesuai umur.</li>
+                        <li><b>Lemak Tambahan:</b> Tambahkan minyak kelapa/santan/margarin pada MPASI.</li>
+                    </ul>
                     """
-                else: # Umur > 2 tahun
+                else:
                     mitigasi_text = """
-                    1. **Kejar Tumbuh (Catch-up):** Anak butuh kalori ekstra padat gizi.
-                    2. **Susu Tambahan:** Konsultasikan ke dokter untuk susu tinggi kalori (PKMK) jika perlu.
-                    3. **Stimulasi Hormon:** Pastikan anak tidur sebelum jam 9 malam (Hormon pertumbuhan bekerja saat tidur).
+                    <ul style="color: #374151; line-height: 1.8;">
+                        <li><b>Kejar Tumbuh (Catch-up):</b> Anak butuh kalori ekstra padat gizi.</li>
+                        <li><b>Susu Tambahan:</b> Konsultasikan ke dokter untuk susu tinggi kalori (PKMK) jika perlu.</li>
+                        <li><b>Stimulasi Hormon:</b> Pastikan anak tidur sebelum jam 9 malam (Hormon pertumbuhan bekerja saat tidur).</li>
+                    </ul>
                     """
 
-                st.warning(f"**Saran Khusus untuk Usia {umur} Bulan:**\n{mitigasi_text}")
+                st.markdown(f"""
+                    <div style="
+                        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+                        padding: 24px;
+                        border-radius: 16px;
+                        border-left: 5px solid #F59E0B;
+                        margin-bottom: 20px;
+                    ">
+                        <h4 style="color: #92400E; margin: 0 0 12px 0;">
+                            Saran Khusus untuk Usia {umur} Bulan:
+                        </h4>
+                        {mitigasi_text}
+                    </div>
+                """, unsafe_allow_html=True)
                 
-                st.info("ℹ️ **Rujukan:** Segera bawa buku KIA dan anak ke Puskesmas terdekat untuk pengukuran ulang dan validasi tenaga medis.")
+                st.markdown("""
+                    <div style="
+                        background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+                        padding: 20px 24px;
+                        border-radius: 12px;
+                        border-left: 4px solid #3B82F6;
+                    ">
+                        <p style="margin: 0; color: #1E40AF;">
+                            <b>Rujukan:</b> Segera bawa buku KIA dan anak ke Puskesmas terdekat 
+                            untuk pengukuran ulang dan validasi tenaga medis.
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
 
-            # 5. TRANSPARANSI DATA (Opsional)
-            with st.expander("🔍 Lihat Detail Probabilitas Algoritma"):
+            # 5. TRANSPARANSI DATA
+            with st.expander("📊 Lihat Detail Probabilitas Algoritma"):
                 st.write("Skor kemungkinan untuk setiap kategori:")
                 
-                # Menggunakan mapping yang benar untuk label kolom
                 if mapping:
                     labels = [mapping[i] for i in range(len(mapping))]
                     probs_df = pd.DataFrame(pred_proba, columns=labels)
